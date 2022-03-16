@@ -6,6 +6,7 @@ Cleaning Data in SQL Queries
 
 SELECT * FROM nashville_housing
 
+-------------------------------------------------------------------------------------
 --Standardize Sale Date format
 
 
@@ -36,3 +37,31 @@ DROP COLUMN saledate;
 --rename column
 EXEC sp_rename 'nashville_housing.saledate_update', 'saledate';
 
+-------------------------------------------------------------------------------------------------
+
+--Populate Property Address Data
+
+SELECT * FROM nashville_housing
+--WHERE PropertyAddress IS NULL
+ORDER BY ParcelID
+
+--if parcel id mathces the preceding row and property address is present in current row but not in preceding row
+--populate with copy of address
+
+SELECT a.ParcelID, a.PropertyAddress,b.ParcelID, b.PropertyAddress 
+FROM nashville_housing a
+JOIN nashville_housing b
+--WHERE PropertyAddress IS NULL
+	on a.ParcelID = b.ParcelID
+	AND a.[UniqueID ] <> b.[UniqueID ]
+WHERE a.PropertyAddress IS NULL
+
+
+UPDATE a
+SET propertyAddress = ISNULL(a.PropertyAddress,b.PropertyAddress)
+FROM nashville_housing a
+JOIN nashville_housing b
+--WHERE PropertyAddress IS NULL
+	on a.ParcelID = b.ParcelID
+	AND a.[UniqueID ] <> b.[UniqueID ]
+WHERE a.PropertyAddress IS NULL
