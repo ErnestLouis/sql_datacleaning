@@ -65,3 +65,92 @@ JOIN nashville_housing b
 	on a.ParcelID = b.ParcelID
 	AND a.[UniqueID ] <> b.[UniqueID ]
 WHERE a.PropertyAddress IS NULL
+
+
+-------------------------------------------------------------------------------------------------
+
+--Seperate Address into Individual Columns (Address,city)
+
+SELECT propertyaddress
+FROM nashville_housing
+
+SELECT SUBSTRING(propertyaddress, 1, CHARINDEX(',',propertyaddress)-1) AS Address,
+SUBSTRING(propertyaddress, CHARINDEX(',',propertyaddress)+1,LEN(PropertyAddress)) AS City
+FROM nashville_housing
+
+--Create new address column
+ALTER TABLE nashville_housing
+ADD separated_propertyaddress NVarchar(255);
+
+UPDATE nashville_housing
+SET separated_propertyaddress = SUBSTRING(propertyaddress, 1, CHARINDEX(',',propertyaddress)-1)
+
+--Create new city column
+ALTER TABLE nashville_housing
+ADD separated_propertycity NVarchar(255);
+
+UPDATE nashville_housing
+SET separated_propertycity = SUBSTRING(propertyaddress, CHARINDEX(',',propertyaddress)+1,LEN(PropertyAddress))
+
+-------------------------------------------------------------------------------------------------
+
+--Seperate OwnerAddress into Individual Columns (Address,city,state)
+
+
+SELECT owneraddress FROM nashville_housing
+
+SELECT
+PARSENAME(REPLACE(owneraddress,',','.'),3),
+PARSENAME(REPLACE(owneraddress,',','.'),2),
+PARSENAME(REPLACE(owneraddress,',','.'),1)
+FROM nashville_housing
+
+--Create new address column
+ALTER TABLE nashville_housing
+ADD separated_owneraddress NVarchar(255);
+
+UPDATE nashville_housing
+SET separated_owneraddress = PARSENAME(REPLACE(owneraddress,',','.'),3)
+
+--Create new city column
+ALTER TABLE nashville_housing
+ADD separated_ownercity NVarchar(255);
+
+UPDATE nashville_housing
+SET separated_ownercity = PARSENAME(REPLACE(owneraddress,',','.'),2)
+
+--Create new state column
+ALTER TABLE nashville_housing
+ADD separated_ownerstate NVarchar(255);
+
+UPDATE nashville_housing
+SET separated_ownerstate = PARSENAME(REPLACE(owneraddress,',','.'),1)
+
+--Change Y and N to Yes and NO in "Sold as Vacant" field
+
+SELECT DISTINCT soldasvacant ,COUNT(soldasvacant)
+FROM nashville_housing
+GROUP BY soldasvacant
+ORDER BY 2
+
+
+--conversts Y and N to Yes and No
+
+SELECT soldasvacant,
+CASE
+	WHEN Soldasvacant = 'Y' THEN 'Yes'
+	WHEN Soldasvacant = 'N' THEN 'No'
+	ELSE Soldasvacant
+END
+FROM nashville_housing
+
+--Implement conversion update
+
+UPDATE nashville_housing
+SET soldasvacant = CASE
+	WHEN Soldasvacant = 'Y' THEN 'Yes'
+	WHEN Soldasvacant = 'N' THEN 'No'
+	ELSE Soldasvacant
+END
+
+-------------------------------------------------------------------------------------------------
