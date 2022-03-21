@@ -154,3 +154,30 @@ SET soldasvacant = CASE
 END
 
 -------------------------------------------------------------------------------------------------
+
+--Remove duplicates 
+--using cte and partition
+
+WITH Rownum_cte AS(
+Select *,
+	ROW_NUMBER() OVER (
+	PARTITION BY ParcelID,
+				 PropertyAddress,
+				 SalePrice,
+				 LegalReference
+				 ORDER BY
+					UniqueID
+					) row_num
+FROM nashville_housing
+)
+DELETE --SELECT *,
+FROM Rownum_cte
+WHERE row_num > 1
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Delete Unused Columns
+
+SELECT * 
+FROM nashville_housing
+
