@@ -133,8 +133,8 @@ FROM nashville_housing
 GROUP BY soldasvacant
 ORDER BY 2
 
-
---conversts Y and N to Yes and No
+------------------------------------------------------------------------------------------------------------------------------------
+--converts Y and N to Yes and No
 
 SELECT soldasvacant,
 CASE
