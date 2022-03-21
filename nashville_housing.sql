@@ -181,3 +181,6 @@ WHERE row_num > 1
 SELECT * 
 FROM nashville_housing
 
+ALTER TABLE nashville_housing
+DROP COLUMN OwnerAddress, TaxDistrict, PropertyAddress
+
